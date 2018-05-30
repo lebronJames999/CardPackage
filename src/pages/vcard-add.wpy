@@ -1,0 +1,47 @@
+<template>
+  <view>
+    <view class="area-title">支持区域</view>
+    <view wx:for="{{citys}}" wx:for-item="item" wx:key="index">
+      <view class="city-title">{{item.city}}</view>
+      <view class="shop-list">
+        <navigator url="{{'face-upload?shopId=' + shop.shopId}}" class="shop-item" wx:for="{{item.shops}}" wx:key="index" wx:for-item="shop">
+          {{shop.shopName}}
+          <view class="item__line"></view>
+        </navigator>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import { fetchShops } from '../net/requests'
+
+export default class extends wepy.page {
+  data = {
+    citys: []
+  }
+
+  onLoad() {
+    fetchShops().then(res => {
+      if (res.code === 200) {
+        this.citys = res.data
+        this.$apply()
+      }
+    })
+  }
+}
+</script>
+
+<style lang="less">
+
+page {
+  background: #f5f5f5;
+}
+
+.area-title {
+  font-size: 30rpx;
+  color: #333;
+  padding: 24rpx 32rpx;
+}
+</style>

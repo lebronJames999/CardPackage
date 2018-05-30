@@ -1,0 +1,136 @@
+<template>
+  <view class="search-bar">
+    <view class="input-container flex flex--y-center">
+      <image class="icon-search" src="//public-10000230.image.myqcloud.com/20d4db3f-3a3c-4658-ac13-1be476a64e56" alt="" />
+      <input class="search-input flex__item" @input="input" type="text" placeholder="请搜索菜品名或订单号" />
+      <view wx:if="" class="icon-search-delete" alt="" @tap="searchText = ''"><image src="//public-10000230.image.myqcloud.com/aacb2beb-d200-48ff-9038-54ba5aed5265" /></view>
+  </view>
+  </view>
+  
+  <view class="page-orders">
+    <repeat for="{{orders}}" key="index" item="order">
+      <OrderListItem :order="order" isNav="true"/>
+    </repeat>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import OrderListItem from "../components/order__list-item";
+import { fetchOrders } from "../net/requests";
+
+export default class extends wepy.page {
+  components = {
+    OrderListItem
+  }
+
+  data = {
+    orders: [],
+    searchText: '',
+    lastOrderNo: undefined
+  }
+
+  fetchOrder(refresh) {
+    const param = {
+      productName: this.searchText
+    }
+    if (this.lastOrderNo && !refresh) {
+      param.lastOrderNo = this.lastOrderNo
+    }
+  
+    fetchOrders(param).then(res => {
+      if (res.code == 200) {
+        if (refresh) {
+          this.orders = [];
+        }
+        res.data.forEach(element => {
+          element.fixPrice = (element.totalFee / 100).toFixed(2)
+          this.orders.push(element)
+        });
+
+        if (this.orders.length) {
+          this.lastOrderNo = this.orders[this.orders.length - 1].orderNo;
+        }
+        // this.orders = [...this.orders, ...res.data.]
+        this.$apply()
+      }
+    })
+  }
+
+  fixOrderPrice(order) {
+    order.fixPrice = (order.totalFee / 100).toFixed(2)
+    return order
+  }
+
+  onLoad() {
+    this.fetchOrder()
+  }
+
+  onReachBottom() {
+    this.fetchOrder()
+  }
+
+  methods = {
+    input(e) {
+      this.searchText = e.detail.value
+      this.fetchOrder(true);
+    }
+  }
+}
+</script>
+
+<style lang="less">
+page {
+  background-color: rgba(245,245,245,1);
+}
+
+.search-bar {
+  padding: 18rpx 16rpx;
+  background: #f1f1f1;
+}
+
+.input-container {
+  background-color: #fff;
+  position: relative;
+  height: 35px;
+  // padding: 18rpx 16rpx;
+  border-radius: 8rpx;
+  border-color: #ccc;
+}
+
+.search-input {
+  display: block;
+  width: 100%;
+  font-size: 28rpx;
+  outline: none;
+  border: none;
+  color: #333;
+}
+
+.search-input::-webkit-input-placeholder {
+  color: #ccc;
+}
+
+.icon-search {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin: 0 8px;
+  // position: abso
+}
+
+.icon-search-delete {
+  display: inline-block;
+  padding: 5px 10px;
+  border: none;
+  background: transparent;
+  outline: none;
+
+  image {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+</style>

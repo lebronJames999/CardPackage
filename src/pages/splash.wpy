@@ -1,0 +1,62 @@
+<style lang="less">
+
+</style>
+<template>
+  <view class="page">
+    <view>
+      <button open-type="getUserInfo" bindgetuserinfo="onUserInfo">登录</button>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import {
+      auth,
+      register
+  } from '../net/auth'
+  // import ws from '../net/ws'
+  // import {
+  //   signs
+  // } from '../net/work'
+  // import PageMixin from '../mixins/page'
+
+  export default class Splash extends wepy.page {
+    // mixins = [ PageMixin ]
+    onLoad(options) {
+      auth().then(res => {
+        console.log('Auth: ', res)
+        if (res.success) {
+          wepy.reLaunch({
+            url: 'card-package'
+          })
+        }
+      }).catch(e => {
+        console.log(e)
+      })
+    }
+    
+    _doOnLogin() {
+      wepy.reLaunch({
+        url: 'card-package'
+      })
+    }
+
+    methods = {
+      onUserInfo(info) {
+        let { detail } = info
+        if (detail.iv) {
+          register({
+            iv: detail.iv,
+            rawData: detail.rawData,
+            signature: detail.signature,
+            encryptedData: detail.encryptedData
+          }).then(() => {
+            this._doOnLogin()
+          }).catch(e => {
+            console.log('GetUserInfo: ', info)
+          }) 
+        } // 用户拒绝授权
+      }
+    }
+  }
+</script>

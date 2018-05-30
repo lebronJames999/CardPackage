@@ -1,0 +1,18 @@
+<template>
+  <view>
+    <view></view>
+  </view>
+</template>
+
+<script>
+import wepy from "wepy"
+import { VCADDSUCIMG } from '../constant/index'
+
+export default class extends wepy.component {
+
+}
+</script>
+
+<style lang="less">
+
+</style>

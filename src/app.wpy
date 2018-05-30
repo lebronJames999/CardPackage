@@ -1,0 +1,150 @@
+<style lang="less">
+@import './assets/less/flex-bem';
+@import './lib/style/widget/weui-cell/weui-cell.less';
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.wx-switch-input{
+  width: 102rpx !important;
+  height: 60rpx !important;
+}
+/*白色样式（false的样式）*/
+.wx-switch-input::before{
+  width: 98rpx !important;
+  height: 56rpx !important;
+}
+/*绿色样式（true的样式）*/
+.wx-switch-input::after{
+  width: 54rpx !important;
+  height: 54rpx !important;
+}
+
+.btn--style-remove {
+  border: none;
+  line-height: 1.2;
+
+  &::before {
+     display: none;
+  }
+
+  &::after {
+    display: none;
+  }
+}
+
+.btn-confirm {
+  display: inline-block;
+  padding: 20rpx 116rpx;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  color: #fff;
+  background-color: #00aaff;
+}
+
+.city-title {
+  font-size: 24rpx;
+  color: #999;
+  padding: 24rpx 32rpx;
+}
+
+
+.shop-item {
+  background-color: #fff;
+  padding: 24rpx 32rpx;
+  font-size: 28rpx;
+  position: relative;
+
+  .item__line {
+    position: absolute;
+    height: 1rpx;
+    bottom: 1rpx;
+    left: 52rpx;
+    right: 52rpx;
+    background-color: #ddd;
+  }
+
+  &:last-child {
+    .item__line {
+      display: none;
+    }
+  }
+}
+
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+
+import { setStore } from 'wepy-redux'
+import configStore from './store'
+
+const store = configStore()
+setStore(store)
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/splash',
+      'pages/card-package',
+      'pages/face-upload',
+      'pages/vcard-add',
+      'pages/virtual-card',
+      'pages/entity-card',
+      'pages/etcard-add',
+      'pages/order',
+      'pages/me',
+      'pages/card-recharge'
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: 'WeChat',
+      navigationBarTextStyle: 'black'
+    },
+    tabBar: {
+      color: '#8E8E93',
+      selectedColor: '#4CA1FB',
+      backgroundColor: '#FCFCFC',
+      borderStyle: 'black',
+      list: [{
+        text: '卡包',
+        pagePath: 'pages/card-package',
+        iconPath: './images/icon_kabao_default@2x.png',
+        selectedIconPath: './images/icon_kabao_selected@2x.png'
+      }, {
+        text: '订单',
+        pagePath: 'pages/order',
+        iconPath: './images/icon_dingdan_default@2x.png',
+        selectedIconPath: './images/icon_dingdan_selected@2x.png'
+      }, {
+        text: '我的',
+        pagePath: 'pages/me',
+        iconPath: './images/icon_me_default@2x.png',
+        selectedIconPath: './images/icon_me_selected@2x.png'
+      }]
+    }
+  }
+
+  globalData = {
+    userInfo: null
+  }
+
+  constructor () {
+    super()
+    this.use('requestfix')
+    this.use('promisify')
+  }
+
+  onLaunch() {
+    // this.testAsync()
+  }
+}
+</script>

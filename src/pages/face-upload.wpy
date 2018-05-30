@@ -1,0 +1,99 @@
+<template>
+  <view>
+    <image class="" src="{{userImg || defaultImg}}" @tap="chooseImage('camera')"/>
+    <button @tap="createCard">上传</button>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import { fetchQNToken, createCard } from '../net/requests'
+import { guid } from '../lib/utils'
+const qiniuUploader = require("../lib/qiniuUploader");
+
+export default class extends wepy.page {
+  data = {
+    userImg: undefined,
+    defaultImg: 'http://img.binguoai.com/2018-05-26-icon_me_default%402x.png',
+    shopId: undefined,
+  }
+
+  onLoad(options) {
+    console.log(options)
+    this.shopId = options.shopId
+  }
+
+  initQiniu(token, gid) {
+    return {
+      region: 'ECN', // 华东区
+      uptoken: token,
+      domain: 'http://img.binguoai.com/',
+      key: gid
+    };
+  }
+
+  methods = {
+    chooseImage() {
+      wepy.chooseImage({
+        count: 1,
+        sizeType: ['compressed'],
+      }).then(res => {
+        console.log(res)
+        this.userImg = res.tempFilePaths[0]
+        this.$apply()
+      })
+    },
+    async createCard() {
+      const fileKey = `${guid()}.png`;
+      const res = await fetchQNToken()
+
+      let token;
+      if (res.code === 200) {
+        token = res.data;
+      }
+      
+      const imgUploadRes = await new Promise(resolve => {
+        qiniuUploader.upload(this.userImg, (res) => {
+          resolve(res)
+        }, (error) => {
+          
+        }, this.initQiniu(token, fileKey));
+      })
+
+      console.log('res:sdfjksajfs',imgUploadRes)
+
+      if (!imgUploadRes.key) {
+        return
+      }
+
+      const cardRes = await createCard({
+        cardType: 0,
+        // faceUrl: '',
+        faceUrl: imgUploadRes.imageURL,
+        shopId: +this.shopId
+      })
+
+      if (cardRes.code === 200) {
+        wepy.showToast({
+          title: '上传人脸照片成功',
+          icon: 'success'
+        }).then(() => {
+          wepy.redirectTo({
+            url: ''
+          })
+        })
+      } else {
+        wepy.showToast({
+          title: '上传人脸失败',
+          icon: 'none'
+        })
+      }
+     
+    }
+  }
+}
+</script>
+
+<style lang="less">
+
+</style>

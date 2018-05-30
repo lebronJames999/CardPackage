@@ -1,0 +1,275 @@
+<template>
+  <view class="page__card-detail">
+    <CardFace/>
+    <view class="card-config">
+      <view class="base-info">
+        <view class="name">{{currCard.name}}</view>
+        <view class="money">{{currCard.accountBalance / 100}}</view>
+        <navigator class="btn--style-remove btn-confirm" url="{{chargeUrl}}">立即充值</navigator>
+      </view>
+
+      <view class="card-form">
+        <view class="form-cell flex flex--y-center flex--between">
+          <view class="form-cell__hd">别名</view>
+          <view class="form-cell__bd flex__item flex flex--y-center flex--end cell--with-acess">
+            <input value="{{currCard.name}}" placeholder="填写卡片别名" @confirm="confirmName"/>
+          </view>
+        </view>
+        <view class="form-cell flex flex--y-center flex--between">
+          <view class="form-cell__hd">卡种类</view>
+          <view class="form-cell__bd flex__item flex flex--y-center flex--end">虚拟卡</view>
+        </view>
+        <view class="form-cell flex flex--y-center flex--between">
+          <view class="form-cell__hd">卡号</view>
+          <view class="form-cell__bd flex__item flex flex--y-center flex--end">{{currCard.cardNo}}</view>
+        </view>
+        <view class="form-cell flex flex--y-center flex--between">
+          <view class="form-cell__hd">交易统计</view>
+          <view class="form-cell__bd flex__item flex flex--y-center flex--end cell--with-acess"></view>
+        </view>
+        <view class="form-cell flex flex--y-center flex--between">
+          <view class="form-cell__hd">设为主卡</view>
+          <view class="form-cell__bd flex__item flex flex--y-center flex--end">
+            <switch checked="{{currCard.isMaster}}" @change="setCardMaster"/>
+          </view>
+        </view>
+        <view class="form-cell flex flex--y-center flex--between">
+          <view class="form-cell__hd">免密支付</view>
+          <view class="form-cell__bd flex__item flex flex--y-center flex--end">
+            <switch checked="{{currCard.isNoPasswordPay}}" @change="setNoPwd"/>
+          </view>
+        </view>
+        <view class="form-cell flex flex--y-center flex--between">
+          <view class="form-cell__hd red-hd">退卡</view>
+          <view class="form-cell__bd flex__item flex flex--y-center flex--end cell--with-acess"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+</template>
+
+<script>
+import wepy from 'wepy'
+import { connect } from "wepy-redux"
+import CardFace from '../components/card-face'
+import { modifyCard } from '../store/actions'
+import { updateCard } from "../net/requests"
+import { getStore } from 'wepy-redux'
+const store = getStore()
+
+@connect({
+  allCards(state) {
+    return state.card.allCards
+  }
+  // currCard(state) {
+  //   return state.card.allCards.filter(card => {
+  //     console.log(card.id)
+  //     return card.id === 10003
+  //   })[0]
+  // }
+})
+export default class extends wepy.page {
+  components = {
+    CardFace
+  }
+
+  data = {
+    cardId: undefined,
+    currCard: {}
+    // card: {}
+  }
+
+  onLoad(options) {
+    this.cardId = options.cardId
+    this.currCard = store.getState().card.allCards.filter(card => {
+      return this.cardId == card.id
+    })[0]
+  }
+
+  computed = {
+    chargeUrl() {
+      return `card-recharge?cardId=${this.cardId}&cardNo=${this.currCard.cardNo}&shopId=${this.currCard.shopId}`
+    }
+  }
+
+  showToastWithObj(obj) {
+    wepy.showToast(obj)
+  }
+
+  getModifyData() {
+    return {
+      name: this.currCard.name,
+      isNoPasswordPay: this.currCard.isNoPasswordPay,
+      isMaster: this.currCard.isMaster
+    }
+  }
+  
+  methods = {
+    setCardMaster(e) {
+      this.currCard.isMaster = e.detail.value
+      const data = this.getModifyData();
+      updateCard({
+        ...data,
+        cardId: this.cardId
+      }).then(res => {
+        if (res.code === 200) {
+          this.showToastWithObj({
+            title: '设置主卡成功',
+            icon: 'success'
+          })
+
+          store.dispatch(modifyCard({
+          ...this.currCard,
+          ...this.getModifyData
+        }))
+        }
+      })
+    },
+    setNoPwd(e) {
+      this.currCard.isNoPasswordPay = e.detail.value
+      updateCard({
+        ...this.getModifyData(),
+        cardId: this.cardId
+      }).then(res => {
+        if (res.code === 200) {
+          this.showToastWithObj({
+            title: '设置免密支付成功',
+            icon: 'success'
+          })
+        }
+        
+        store.dispatch(modifyCard({
+          ...this.currCard,
+          ...this.getModifyData
+        }))
+      })
+    },
+    confirmName(e) {
+      const val = e.detail.value;
+      if (!val.length) return
+      this.currCard.name = val
+      updateCard({
+        ...this.getModifyData(),
+        cardId: this.cardId
+      }).then(res => {
+        if (res.code === 200) {
+          this.showToastWithObj({
+            title: '设置别名成功',
+            icon: 'success'
+          })
+        }
+        
+        store.dispatch(modifyCard({
+          ...this.currCard,
+          ...this.getModifyData
+        }))
+      })
+    }
+  }
+}
+</script>
+
+<style lang="less">
+page {
+  background-color: #ececec;
+}
+
+.page__card-detail {
+  background-color: transparent;
+  padding: 20rpx;
+}
+
+.card-config {
+  background: #fff;
+  padding: 94rpx 32rpx;
+  border-radius: 18rpx 18rpx 0rpx 0rpx;
+
+  .base-info {
+    text-align: center;
+
+    .name {
+      font-size: 40rpx;
+      color: #333;
+    }
+
+    .money {
+      font-size: 64rpx;
+      color: #ff3b30;
+      margin-top: 12rpx;
+    }
+
+    .btn-confirm {
+      margin-top: 20rpx;
+    }
+  }
+
+  .card-form {
+    margin-top: 80rpx;
+  }
+
+  .form-cell {
+    height: 90rpx;
+    font-size: 28rpx;
+    position: relative;
+
+    &:nth-child(n) {
+      &::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        bottom: 0.5px;
+        height: 0.5rpx;
+        background-color: #ddd;
+      }
+    }
+  }
+
+  .form-cell__hd {
+    color: #333;
+
+    &.red-hd {
+      color: #E1584E;
+    }
+  }
+
+  .form-cell__bd {
+    color: #999;
+    
+    input {
+      line-height: 1;
+      text-align: right;
+    }
+
+    switch {
+      display: block;
+      // width: 50rpx;
+      height: 62rpx;
+    }
+
+    &.cell--with-acess {
+      padding-right: 40rpx;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        width: 18rpx;
+        height: 30rpx;
+        background-size: 100%;
+        background-image: url('http://img.binguoai.com/2018-05-19-icon_youjiantou%402x.png');
+        background-repeat: no-repeat;
+        right: 0;
+        top: 50%;
+        margin-top: -9rpx;
+      }
+    }
+  }
+
+  .cell__acess {
+    width: 12rpx;
+    height: 22rpx;
+  }
+}
+
+</style>

@@ -1,0 +1,140 @@
+<template>
+  <view class="input-panel">
+    <view class="input__title">
+      充值金额
+    </view>
+    <view class="input__container flex">
+      <text class="money__logo">￥</text>
+      <input class="money__input" type="number" @input="inputMoney" placeholder="输入充值金额" />
+    </view>
+  </view>
+
+  <button class="charge-btn {{unableCharge ? 'charge-btn-disabled' : '' }}" @tap="charge" disabled="{{unableCharge}}">确定</button>
+</template>
+
+<script>
+import wepy from 'wepy'
+import { genChargeOrder } from '../net/requests'
+import { noLineGuid } from '../lib/utils'
+
+export default class extends wepy.page {
+  data = {
+    cardId: undefined,
+    cardNo: undefined,
+    shopId: undefined,
+    money: undefined,
+    isCharging: false
+  }
+
+  onLoad(options) {
+    this.cardId = options.cardId;
+    this.cardNo = options.cardNo;
+    this.shopId = options.shopId;
+  }
+
+  computed = {
+    unableCharge() {
+      return this.isCharging || +this.money === 0 || !this.money;
+    }
+  }
+
+  methods = {
+    inputMoney(e) {
+      const val = e.detail.value;
+      console.log(val);
+      
+      if (!this.money) {
+        this.money = val === '.' ? '0.' : val
+      } else if (val === '') {
+        this.money = ''
+      } else if (this.money == 0 && !val.includes('.')) {
+        this.money = val.slice(1)
+      } else if (/^\d{1,8}(\.?|\.\d{1,2})$/.test(val)) {
+        this.money = val
+      } 
+      return this.money
+
+      // this.money = +e.detail.value
+      // return 1
+    },
+    async charge() {
+      const param = {
+        cardId: +this.cardId,
+        cardNo: this.cardNo,
+        shopId: +this.shopId,
+        rechargeFee: +this.money * 100
+      }
+
+      const orderRes = await genChargeOrder(param)
+      if (!orderRes.code === 200) return
+      let order = orderRes.data
+      order = {
+        ...order,
+        ...{
+          nonceStr: `${noLineGuid()}`,
+          signType: 'MD5',
+          package: order._package
+        }
+      }
+      wepy.requestPayment(order)
+      .then(res => {
+        console.log(res)
+      })
+      .catch(e => {
+        console.log(e)
+      })
+    }
+  }
+}
+</script>
+
+<style lang="less">
+page {
+  background-color: #f5f5f5;
+}
+
+.input-panel {
+  background-color: #fff;
+  margin-top: 20rpx;
+  padding: 34rpx 36rpx;
+
+  .input__title {
+    font-size: 32rpx;
+    color: #333;
+  }
+
+  .input__container {
+    margin-top: 50rpx;
+  }
+
+  .money__logo {
+    font-size: 44rpx;
+    color: #333;
+  }
+
+  .money__input {
+    font-size: 48rpx;
+    color: #333;
+    padding-left: 10rpx;
+
+    &::-webkit-input-placeholder {
+      color: #ccc;
+    }
+  }
+}
+
+.charge-btn {
+  font-size: 32rpx;
+  color: #fff;
+  background-color: #00aaff;
+  opacity: 1;
+  margin: 80rpx 24rpx 0 24rpx;
+
+  &.charge-btn-disabled {
+    opacity: .3;
+    background-color: #00aaff !important;
+  }
+}
+
+
+</style>

@@ -1,0 +1,7 @@
+export const SAVECARDS = 'SAVECARDS'
+
+export const MODIFYCARD = 'MODIFYCARD';
+
+export const DECREMENT = 'DECREMENT'
+
+export const ASYNC_INCREMENT = 'ASYNC_INCREMENT'

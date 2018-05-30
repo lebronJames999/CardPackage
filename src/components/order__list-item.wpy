@@ -1,0 +1,107 @@
+<template>
+  <view class="order--info-base" @tap="orderTap">
+    <view class="base__hd flex flex--y-center flex--between">
+      <text class="name">{{order.shopName}}</text>
+      <view class="order--pay-way {{payTypeStyle[order.payType]}}">{{payType[order.payType]}}</view>
+    </view>
+    <view class="base__bd flex flex--y-center flex--between">
+      <view class="bd-left">
+        <view class="order-no">订单号：{{order.orderNo}}</view>
+        <view class="order-date">{{order.payTime}}</view>
+      </view>
+      <view class="bd-right">
+        <view class="order-product">共{{order.itemCount}}项菜品</view>
+        <view class="order-price">￥{{order.fixPrice}}</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from "wepy"
+// const fixPrice = (price) => (price / 100).toFixed(2)
+
+export default class extends wepy.component {
+  props = {
+    order: Object,
+    isNav: Boolean
+  }
+
+  data = {
+    payType: {
+      0: '二维码支付',
+      1: '人脸支付',
+      2: '实体卡支付',
+      3: '其他支付'
+    },
+    payTypeStyle: {
+      1: 'theme-red'
+    }
+  }
+
+  methods = {
+    orderTap(e) {
+      console.log(e);
+    }
+  }
+}
+</script>
+
+<style lang="less">
+.order--info-base {
+  background-color: #fff;
+  padding: 0rpx 32rpx;
+
+  &:nth-child(n+2) {
+    margin-top: 20rpx;
+  }
+
+  .base__hd {
+    padding: 24rpx 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .base__bd {
+    padding: 26rpx 0 32rpx 0;
+  }
+
+  .name {
+    font-size: 28rpx;
+    color: #333;
+  }
+
+  .order--pay-way {
+    font-size: 20rpx;
+    padding: 8rpx 12rpx;
+
+    &.theme-red {
+      border-color: red;
+      color: red;
+    }
+  }
+
+  .order-no {
+    font-size: 28rpx;
+    color: #666;
+  }
+
+  .order-date {
+    color: #999;
+    font-size: 24rpx;
+    margin-top: 6rpx;
+  }
+
+  .order-price {
+    font-size: 36rpx;
+    color: #333;
+    margin-top: 6rpx;
+    text-align: right;
+  }
+  
+  .order-product {
+    font-size: 24rpx;
+    color: #666;
+  }
+
+}
+</style>

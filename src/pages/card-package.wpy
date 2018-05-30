@@ -1,0 +1,99 @@
+<template>
+  <view class="card__list vcard__list">
+    <text class="list__title">添加虚拟卡</text>
+    <view class="list__content">
+      <repeat for="{{vCardList}}" index="index" key="index" item="item" >
+        <cardItem @cardTap="cardTap" :card.sync="item" :sss="1" />
+      </repeat>
+      
+      <CardAddVirtual @cardTap="cardTap" addVCard="true">
+        <image slot="cardIcon" class="card__icon" src="http://img.binguoai.com/2018-05-19-card_link.png"/>
+        <text slot="contentInfo" class="content__title">点击添加虚拟卡</text>
+      </CardAddVirtual>
+    </view>
+  </view>
+
+  <view class="card__list ecard__list">
+    <text class="list__title">关联一卡通</text>
+    <view class="list__content">
+      <CardAddEntry @cardTap="cardTap" addETCard="true">
+        <image slot="cardIcon" class="card__icon" src="http://img.binguoai.com/2018-05-19-card_link.png"/>
+        <text slot="contentInfo" class="content__title">关联一卡通</text>
+      </CardAddEntry>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import CardListItem from "../components/card__list-item";
+import { connect } from 'wepy-redux';
+import { syncCards } from '../store/actions';
+import { getStore } from 'wepy-redux'
+const store = getStore()
+
+@connect({
+  vCardList(state) {
+    return state.card.vCardList;
+  },
+  eCardList(state) {
+    return state.card.eCardList;
+  }
+})
+export default class extends wepy.page {
+  components = {
+    CardAddVirtual: CardListItem,
+    CardAddEntry: CardListItem,
+    cardItem: CardListItem
+  }
+
+  data = {
+    
+  }
+
+  computed = {
+    // vCardsList() {
+    //   return this.vcards && this.vcards.payCards
+    // },
+    // eCardsList() {
+    //   return this.ecards && this.ecards.payCards
+    // }
+  }
+
+  onLoad() {
+    store.dispatch(syncCards())
+  }
+
+  events = {
+    cardTap(url) {
+      wepy.navigateTo({
+        url
+      })
+    }
+  }
+}
+</script>
+
+<style lang="less">
+.card__list {
+  padding: 0 36rpx;
+
+  .list__title {
+    font-size: 30rpx;
+    color: #333;
+  }
+
+  .list__content {
+    margin-top: 14rpx;
+    box-shadow: 0px 4rpx 10rpx 0rpx rgba(0,0,0,0.08);
+    border-radius: 8rpx;
+  }
+
+
+  &:last-child {
+    margin-top: 56rpx;
+  }
+}
+
+
+</style>

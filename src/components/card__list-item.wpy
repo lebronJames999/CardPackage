@@ -1,0 +1,116 @@
+<template>
+  <view class="card__add-entry flex card__list-item" @tap="cardTap">
+    <slot name="cardIcon">
+      <image class="card__icon" src="http://img.binguoai.com/2018-05-19-icon_add_yitianjia%402x.png"/>
+    </slot>
+    <view class="card__content flex flex--between flex--y-center flex__item">
+      <slot name="contentInfo">
+        <!-- <view>
+          <text class="content__title">{{card.name}}</text>
+          <text class="content__sub">{{card.number}}</text>
+        </view> -->
+      </slot>
+
+      <view wx:if="{{card}}">
+        <text class="content__title">{{card.name}}</text>
+        <text class="content__sub">{{card.cardNo}}</text>
+      </view>
+    
+      <view class="content__money" wx:if="{{card.accountBalance !== undefined}}">
+        <text class="currency">￥</text>
+        <text class="amount">{{card.accountBalance / 100.0}}</text>
+      </view>
+    </view>
+    <view class="bottom__line" wx:if="{{card}}"></view>
+  </view>
+</template>
+
+<script>
+import wepy from "wepy";
+export default class extends wepy.component {
+  props = {
+    card: Object,
+    addETCard: String,
+    addVCard: String,
+    sss: String
+  }
+
+  onLoad() {
+  }
+
+  methods = {
+    cardTap() {
+      let url
+      console.log(this.addETCard)
+      if (!!this.addETCard) {
+        url = 'etcard-add'
+      } else if (!!this.addVCard) {
+        console.log(this.addVCard)
+        url = 'vcard-add'
+      } else if (this.card) {
+        // url = this.card.vcard ? `virtual-card?cardId=${this.card.id}` : `entity-card?cardId=${this.card.id}`
+        url = `virtual-card?cardId=${this.card.id}`
+
+      }
+
+      this.$emit('cardTap', url)
+    }
+  }
+}
+</script>
+
+<style lang="less">
+.card__list-item {
+  padding: 50rpx 40rpx;
+  position: relative;
+
+  .card__icon {
+    width: 60rpx;
+    height: 60rpx;
+  }
+
+  .card__content {
+    margin-left: 32rpx;
+  }
+
+  .content__title,
+  .content__sub {
+    display: block;
+  }
+
+  .content__title {
+    font-size: 30rpx;
+    color: #333;
+    line-height: 1;
+  }
+
+  .content__sub {
+    font-size: 24rpx;
+    color: #999;
+  }
+
+  .card__num {
+    font-size: 24rpx;
+    color: #999;
+  }
+
+  .currency {
+    font-size: 24rpx;
+    color: #ff1917;
+  }
+
+  .amount {
+    font-size: 48rpx;
+    color: #ff1917;
+  }
+
+  .bottom__line {
+    position: absolute;
+    height: 0.5rpx;
+    left: 100rpx;
+    right: 0rpx;
+    bottom: 1rpx;
+    background-color: #ddd;
+  }
+}
+</style>
