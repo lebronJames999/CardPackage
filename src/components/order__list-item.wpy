@@ -40,8 +40,12 @@ export default class extends wepy.component {
   }
 
   methods = {
-    orderTap(e) {
-      console.log(e);
+    orderTap() {
+      if (!this.isNav) return
+      
+      wepy.navigateTo({
+        url: `order-detail?orderNo=${this.order.orderNo}`
+      })
     }
   }
 }

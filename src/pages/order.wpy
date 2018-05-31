@@ -1,5 +1,5 @@
 <template>
-  <view class="search-bar">
+  <view class="search-bar" wx:if="{{orders.length}}">
     <view class="input-container flex flex--y-center">
       <image class="icon-search" src="//public-10000230.image.myqcloud.com/20d4db3f-3a3c-4658-ac13-1be476a64e56" alt="" />
       <input class="search-input flex__item" @input="input" type="text" placeholder="请搜索菜品名或订单号" />
@@ -53,6 +53,11 @@ export default class extends wepy.page {
         }
         // this.orders = [...this.orders, ...res.data.]
         this.$apply()
+      } else {
+        wepy.showToast({
+          icon: 'none',
+          title: res.message
+        })
       }
     })
   }
@@ -63,6 +68,9 @@ export default class extends wepy.page {
   }
 
   onLoad() {
+    wx.setNavigationBarTitle({
+      title: '订单'
+    })
     this.fetchOrder()
   }
 

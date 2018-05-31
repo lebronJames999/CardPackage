@@ -23,6 +23,9 @@ export default class extends wepy.page {
   }
 
   onLoad() {
+    wx.setNavigationBarTitle({
+      title: '关联虚拟卡'
+    })
     fetchShops().then(res => {
       if (res.code === 200) {
         this.citys = res.data

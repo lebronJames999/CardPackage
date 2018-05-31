@@ -1,14 +1,147 @@
 <template>
-  
+  <OrderListItem class="order-base" :order="order"/>
+
+  <view class="product-list">
+    <view class="product__item flex" wx:for="{{order.orderItems}}" wx:for-item="item">
+      <text class="name flex__item">{{item.productName}}</text>
+      <text class="quantity">x{{item.quantity}}</text>
+      <text class="rprice">￥{{item.realPrice / 100}}</text>
+    </view>
+
+    <view class="product__item product__total flex">
+      <text class="name flex__item">小计</text>
+      <text class="quantity">x{{order.itemCount}}</text>
+      <text class="rprice">￥{{item.totalFee / 100}}</text>
+    </view>
+  </view>
+
+  <view class="discount">
+    <view class="discount-item flex flex--y-center">
+      <text class="logo">促</text>
+      <text class="flex__item title">促销优惠</text>
+      <text class="rprice">￥{{order.refundFee}}</text>
+    </view>
+    <view class="real-toatl-price">
+      <text class="total">合计</text><text class="price">￥{{order.realFee / 100}}</text>
+    </view>
+  </view>
 </template>
 
 <script>
 import wepy from 'wepy'
+import OrderListItem from "../components/order__list-item"
+
+import { fetchOrderDetail } from "../net/requests";
+
 export default class extends wepy.page {
-  
+  data = {
+    order: {},
+    orderNo: ''
+  }
+
+  components = {
+    OrderListItem
+  }
+
+  onLoad(options) {
+    wx.setNavigationBarTitle({
+      title: '订单详情'
+    })
+    this.orderNo = options.orderNo
+    fetchOrderDetail(this.orderNo).then(res => {
+      if (res.code === 200) {
+        this.order = res.data
+        this.$apply()
+      }
+    })
+  }
 }
+
 </script>
 
 <style lang="less">
+page {
+  background-color: #f5f5f5;
+}
 
+.order-base {
+  margin-top: 20rpx;
+}
+
+.product-list {
+  background-color: #fff;
+  margin-top: 20rpx;
+  padding: 24rpx 40rpx 32rpx 32rpx;
+}
+
+.product__item {
+  &+.product__item {
+    margin-top: 20rpx;
+  }
+
+  .name,
+  .quantity {
+    font-size: 28rpx;
+    color: #999;
+  }
+
+  .rprice {
+    margin-left: 162rpx;
+    font-size: 28rpx;
+    color: #333;
+  }
+}
+
+.product__total {
+  border-top: 1px solid #ddd;
+  padding-top: 24rpx;
+}
+
+.discount {
+  background: #fff;
+  margin-top: 20rpx;
+  padding: 28rpx 40rpx 28rpx 32rpx;
+}
+
+.real-toatl-price {
+  border-top: 1px solid #ddd;
+  margin-top: 24rpx;
+  padding-top: 36rpx;
+  text-align: right;
+}
+
+.discount-item {
+  margin-top: 20rpx;
+  
+  .logo {
+    font-size: 18rpx;
+    color: #fff;
+    background-color: red;
+    line-height: 1;
+    padding: 8rpx;
+    margin-right: 8rpx;
+  }
+
+  .title {
+    font-size: 28rpx;
+    color: #333;
+  }
+
+  .rprice {
+    font-size: 28rpx;
+    color: #333;
+  }
+}
+
+.real-toatl-price {
+  .total {
+    font-size: 28rpx;
+    color: #333;
+  }
+
+  .price {
+    font-size: 36rpx;
+    color: #ff3b30;
+  }
+}
 </style>

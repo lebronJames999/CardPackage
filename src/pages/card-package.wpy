@@ -47,20 +47,10 @@ export default class extends wepy.page {
     cardItem: CardListItem
   }
 
-  data = {
-    
-  }
-
-  computed = {
-    // vCardsList() {
-    //   return this.vcards && this.vcards.payCards
-    // },
-    // eCardsList() {
-    //   return this.ecards && this.ecards.payCards
-    // }
-  }
-
   onLoad() {
+    wx.setNavigationBarTitle({
+      title: '卡包'
+    })
     store.dispatch(syncCards())
   }
 
@@ -95,5 +85,8 @@ export default class extends wepy.page {
   }
 }
 
+.ecard__list {
+  margin-top: 56rpx;
+}
 
 </style>

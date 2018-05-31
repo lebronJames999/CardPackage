@@ -101,7 +101,8 @@ export default class extends wepy.app {
       'pages/etcard-add',
       'pages/order',
       'pages/me',
-      'pages/card-recharge'
+      'pages/card-recharge',
+      'pages/order-detail'
     ],
     window: {
       backgroundTextStyle: 'light',

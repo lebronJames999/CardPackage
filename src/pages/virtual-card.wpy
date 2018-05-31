@@ -81,6 +81,9 @@ export default class extends wepy.page {
   }
 
   onLoad(options) {
+    wx.setNavigationBarTitle({
+      title: '虚拟卡详情'
+    })
     this.cardId = options.cardId
     this.currCard = store.getState().card.allCards.filter(card => {
       return this.cardId == card.id

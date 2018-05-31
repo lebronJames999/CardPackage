@@ -67,7 +67,7 @@ export const fetchOrders = param => {
   const searchQuery = param.productName ? `productName=${param.productName}` : '';
 
   const queryStr = orderQuery.length ? orderQuery + '&' + searchQuery : searchQuery.length ? '?' + searchQuery : ''
-  return get({ url: `/order/list/0${queryStr}`});
+  return get({ url: `/order/list/${config.customerId}${queryStr}` });
   // return get({ url: `order/list/${config.customerId}${queryStr}` });
 }
 
@@ -80,4 +80,8 @@ export const genChargeOrder = param => postJson({
     customerPhone: config.phone || '',
     openId: config.openId
   }
+});
+
+export const fetchOrderDetail = orderNo => get({
+  url: `/order/detail/${config.customerId}/${orderNo}`
 });

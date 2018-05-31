@@ -49,6 +49,9 @@ export default class extends wepy.page {
   }
 
   onLoad() {
+    wx.setNavigationBarTitle({
+      title: '我的'
+    })
     getUser().then(res => {
       this.userInfo = res
       this.$apply
