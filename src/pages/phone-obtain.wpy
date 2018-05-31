@@ -1,0 +1,95 @@
+<style lang="less">
+  page {
+    background-color: rgba(245, 245, 245, 1);
+  }
+  .page {
+    text-align: center;
+  }
+  .image {
+    width: 130rpx;
+    margin-top: 200rpx;
+  }
+  .tips {
+    color: #8B8F93;
+    font-size: 32rpx;
+    margin-top: 50rpx;
+  }
+  .btn {
+    color: white;
+    font-size: 32rpx;
+    margin: 20rpx 116rpx;
+    margin-top: 140rpx;
+    background-color: #00AAFF;
+    border-radius: 100rpx;
+  }
+  .footer {
+    position: fixed;
+    bottom: 40rpx;
+    width: 100%;
+    color: #00AAFF;
+    font-size: 28rpx;
+    text-align: center;
+    &::after {
+      border: none;
+    }
+  }
+</style>
+
+<template>
+  <view class="page">
+    <image class="image" src="//img.binguoai.com/2018-05-31-661527781408_.pic.jpg" mode="widthFix" />
+    <view class="tips">一建绑定无需验证码</view>
+    <button class="btn" open-type="getPhoneNumber" bindgetphonenumber="">授权绑定</button>
+    <view class="footer" bindtap="onCustomPhone">输入手机号和验证码绑定</view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import {
+    savePhone
+  } from '../net/requests'
+  export default class extends wepy.page {
+    data = {}
+    onLoad() {}
+    methods = {
+      onPhoneNumber(e) {
+        console.log(e)
+        savePhone( /*TODO*/ )
+          .then(res => {
+            if (res.code === 200) {
+              wepy.showToast({
+                title: '绑定成功',
+                icon: 'success',
+                duration: 2000,
+                mask: true
+              }).then(() => {
+                wepy.navigateBack({
+                  delta: 1
+                })
+              })
+            } else {
+              wepy.showToast({
+                title: res.message,
+                icon: 'none',
+                duration: 2000,
+                mask: true
+              })
+            }
+          }).catch(e => {
+            wepy.showToast({
+              title: '绑定失败',
+              icon: 'none',
+              duration: 2000,
+              mask: true
+            })
+          })
+      },
+      onCustomPhone() {
+        wepy.navigateTo({
+          url: 'phone-bind'
+        })
+      }
+    }
+  }
+</script>
