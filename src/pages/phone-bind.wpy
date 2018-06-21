@@ -1,0 +1,180 @@
+<style lang="less">
+  page {
+    background-color: rgba(245, 245, 245, 1);
+  }
+  .phone {
+    background-color: white;
+    padding: 0 32rpx;
+    box-sizing: border-box;
+  }
+  .phone-number {
+    display: flex;
+    height: 100rpx;
+    margin-top: 20rpx;
+    border-bottom: 1rpx solid #DDDDDD;
+  }
+  .phone-number__code {
+    width: 90rpx;
+    height: 100rpx;
+    padding-top: 30rpx;
+    padding-bottom: 30rpx;
+    color: #333333;
+    font-size: 28rpx;
+    box-sizing: border-box;
+  }
+  .phone-number-holder {
+    color: #CCCCCC;
+    font-size: 28rpx;
+  }
+  .phone-number__number {
+    flex: 1;
+    height: 100rpx;
+    padding-top: 30rpx;
+    padding-bottom: 30rpx;
+    box-sizing: border-box;
+    font-size: 28rpx;
+  }
+  .phone-number__btn {
+    background-color: #00AAFF;
+    border-radius: 8rpx;
+    color: white;
+    line-height: 1;
+    height: 60rpx;
+    align-items: center;
+    font-size: 28rpx;
+  }
+  .phone-code {
+    margin-left: 90rpx;
+    height: 100rpx;
+    padding-top: 30rpx;
+    padding-bottom: 30rpx;
+    box-sizing: border-box;
+    font-size: 28rpx;
+  }
+  .button-ok {
+    color: white;
+    padding: 24rpx;
+    font-size: 32rpx;
+    margin: 80rpx 24rpx 0 24rpx;
+    background-color: #00AAFF;
+    border-radius: 8rpx;
+    line-height: 1;
+    box-sizing: border-box;
+  }
+  .button-cancel {
+    color: white;
+    font-size: 32rpx;
+    padding: 24rpx;
+    line-height: 1;
+    margin: 20rpx 24rpx 0 24rpx;
+    background-color: #00AAFF;
+    box-sizing: border-box;
+    border-radius: 8rpx;
+  }
+  .footer {
+    color: #00AAFF;
+    font-size: 28rpx;
+  }
+</style>
+
+<template>
+  <view>
+    <view class="phone">
+      <form bindsubmit="onPhoneCode">
+        <view class="phone-number">
+          <input class="phone-number__code" name="phone_code" maxlength="5" placeholder="+86" placeholder-class="phone-number-holder" />
+          <input class="phone-number__number" name="phone_number" maxlength="11" placeholder="输入手机号" placeholder-class="phone-number-holder" type="number" />
+          <button class="phone-number__btn" form-type="submit" disabled="{{disabled}}">获取验证码</button>
+        </view>
+      </form>
+      <input class="phone-code" value="{{code}}" maxlength="6" placeholder="输入验证码" placeholder-class="phone-number-holder" bindinput="onInputCode" />
+    </view>
+    <button class="button-ok" bindtap="onSure">确定</button>
+    <button class="button-cancel" bindtap="onCancel">取消</button>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import {
+    getPhoneCode,
+    savePhoneNumber
+  } from '../net/requests'
+  export default class extends wepy.page {
+    data = {
+      code: '',
+      disabled: false
+    }
+    onLoad() {}
+    methods = {
+      onPhoneCode(e) {
+        let {
+          phone_code,
+          phone_number
+        } = e.detail.value
+        getPhoneCode(phone_code + phone_number)
+          .then(res => {
+            if (res.code === 200) {
+              this.disabled = true
+            } else {
+              wepy.showToast({
+                title: res.message,
+                icon: 'none',
+                duration: 2000,
+                mask: true
+              })
+            }
+          })
+          .catch(e => {
+            wepy.showToast({
+              title: '请求失败',
+              icon: 'none',
+              duration: 2000,
+              mask: true
+            })
+          })
+      },
+      onInputCode(e) {
+        this.code = e.detail.value
+      },
+      onSure() {
+        savePhoneNumber(this.code)
+          .then(res => {
+            if (res.code === 200) {
+              wepy.showToast({
+                  title: '绑定成功',
+                  icon: 'none',
+                  duration: 2000,
+                  mask: true
+                })
+                .then(() => {
+                  wepy.navigateBack({
+                    delta: 1
+                  })
+                })
+            } else {
+              wepy.showToast({
+                title: res.message,
+                icon: 'none',
+                duration: 2000,
+                mask: true
+              })
+            }
+          })
+          .catch(e => {
+            wepy.showToast({
+              title: '绑定失败',
+              icon: 'none',
+              duration: 2000,
+              mask: true
+            })
+          })
+      },
+      onCancel() {
+        wepy.navigateBack({
+          delta: 1
+        })
+      }
+    }
+  }
+</script>

@@ -92,6 +92,8 @@ setStore(store)
 export default class extends wepy.app {
   config = {
     pages: [
+      'pages/phone-obtain',
+      'pages/phone-bind',
       'pages/splash',
       'pages/card-package',
       'pages/face-upload',

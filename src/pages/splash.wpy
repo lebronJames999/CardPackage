@@ -37,7 +37,8 @@
     
     _doOnLogin() {
       wepy.reLaunch({
-        url: 'card-package'
+        // url: 'card-package'
+        url: 'phone-obtain'
       })
     }
 

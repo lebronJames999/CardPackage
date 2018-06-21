@@ -80,8 +80,36 @@ export const genChargeOrder = param => postJson({
     customerPhone: config.phone || '',
     openId: config.openId
   }
+<<<<<<< HEAD
 });
 
 export const fetchOrderDetail = orderNo => get({
   url: `/order/detail/${config.customerId}/${orderNo}`
 });
+=======
+})
+
+export const getPhoneCode = (phoneNumber) => get({
+  url: '/phone/code',
+  data: {
+    phone: phoneNumber
+  }
+})
+
+export const savePhoneNumber = (phoneNumber, code) => postJson({
+  url: '/phone/checkandsave',
+  data: {
+    customerId: config.customerId,
+    phone: phoneNumber,
+    code: code
+  }
+})
+
+export const savePhone = (encryptedData, iv) => postJson({
+  url: '/phone',
+  data: {
+    encryptedData: encryptedData,
+    iv: iv
+  }
+})
+>>>>>>> 0e5de54efce43338cd010771f2996107313e29b0
